@@ -42,8 +42,8 @@ export function AdminDashboard() {
     try {
       setLoading(true);
       console.log("Fetching notes...");
-
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/userNotes`, {
+      const uri = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const res = await axios.get(`${uri}api/userNotes`, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',

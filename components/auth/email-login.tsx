@@ -24,7 +24,8 @@ export function EmailLogin() {
     try{
       axios.defaults.withCredentials = true;
       setLoading(true)
-      const response = await axios.post(`${process.env.BACKEND_URL}/login`,{
+      const uri = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const response = await axios.post(`${uri}api/login`,{
         email,
         password
       });

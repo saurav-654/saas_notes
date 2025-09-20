@@ -78,8 +78,8 @@ export function AddMember() {
         ...formData
       };
       console.log("Request payload:", requestPayload);
-
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/adduser`, requestPayload, {
+      const uri = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const response = await axios.post(`${uri}api/adduser`, requestPayload, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',

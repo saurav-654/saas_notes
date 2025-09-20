@@ -60,9 +60,9 @@ export function Header({ user, tenantPlan = "FREE", onPlanUpgraded }: HeaderProp
         // Try to get slug from stored data, or use a default
         tenantSlug = userData.data?.tenant?.slug || userData.tenant?.slug || "acme";
       }
-      
+      const uri = process.env.NEXT_PUBLIC_BACKEND_URL;
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/tenants/${tenantSlug}/upgrade`, // ✅ Updated URL format
+        `${uri}api/tenants/${tenantSlug}/upgrade`, // ✅ Updated URL format
         {},
         {
           withCredentials: true,

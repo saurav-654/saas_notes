@@ -34,7 +34,8 @@ export function NoteForm({ onNoteCreated }: NoteFormProps) {
       const userData = JSON.parse(localStorage.getItem('user') || '{}')
       const userEmail = userData.data?.user?.email
       
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/addnotes`, {
+      const uri = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const response = await axios.post(`${uri}api/addnotes`, {
         email: userEmail,
         title: title.trim(),
         content: content.trim()

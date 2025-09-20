@@ -31,11 +31,9 @@ export function Header({ user }: HeaderProps) {
       setLoading(true);
       
       // ✅ Use environment variable for logout API call
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/api';
-      
-      // Optional: Call backend logout endpoint if you have one
+      const uri = process.env.NEXT_PUBLIC_BACKEND_URL;
       try {
-        await axios.post(`${backendUrl}/logout`, {}, {
+        await axios.post(`${uri}api/logout`, {}, {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',

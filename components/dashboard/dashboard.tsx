@@ -44,15 +44,16 @@ export function Dashboard() {
       console.log("Fetching notes...");
 
       // ✅ Use environment variable
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080/api';
-      console.log('Backend URL:', backendUrl); // Debug log
+     const uri = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-      const res = await axios.get(`${backendUrl}/userNotes`, {
+      const res = await axios.get(`${uri}api/userNotes`, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
+            'Accept': 'application/json',
         },
       });
+      console.log(res);
 
       if (res.data.success) {
         const { notes = [], user = null } = res.data.data || {};
@@ -87,8 +88,8 @@ export function Dashboard() {
         console.error("API endpoint not found. Check backend URL.");
       } else if (err.response?.status === 401) {
         console.error("Unauthorized. Redirecting to login.");
-        localStorage.removeItem("user");
-        router.push("/");
+        // localStorage.removeItem("user");
+        // router.push("/");
       }
     } finally {
       setLoading(false);

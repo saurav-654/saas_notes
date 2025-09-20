@@ -89,7 +89,8 @@ export function NoteCard({ note, onDelete, onUpdate }: NoteCardProps) {
     setLoading(true)
     try {
       // ✅ Use the correct backend URL
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/notes/${note.noteId}`, {
+      const uri = process.env.NEXT_PUBLIC_BACKEND_URL;
+      const response = await fetch(`${uri}/api/notes/${note.noteId}`, {
         method: 'PUT',
         credentials: 'include', // ✅ Include cookies for authentication
         headers: {
