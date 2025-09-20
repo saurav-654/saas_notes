@@ -1,96 +1,133 @@
-# SaaS Notes App
+# YardStick SaaS Notes App
 
-A modern, responsive notes application built with Next.js 14, featuring a beautiful custom color palette and comprehensive authentication system.
+A modern SaaS application for managing notes with multi-tenant architecture, user roles, and subscription plans.
 
-## Features
+## 📋 Table of Contents
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Database Models](#database-models)
+- [API Routes](#api-routes)
+- [Authentication & Authorization](#authentication--authorization)
+- [Environment Setup](#environment-setup)
+- [Installation](#installation)
+- [Deployment](#deployment)
+- [Project Structure](#project-structure)
 
-- **Beautiful Custom Color Palette**: Space Cadet, Ultra Violet, Rose Quartz, Pale Dogwood, and Isabelline
-- **Multiple Authentication Methods**: Email/password, Google OAuth, and phone OTP
-- **Dark/Light Mode**: Full theme switching with custom color adaptations
-- **Mobile Responsive**: Optimized for all screen sizes with touch-friendly interactions
-- **Modern UI Components**: Built with shadcn/ui and Radix UI primitives
-- **Notes Management**: Create, edit, delete, and organize your notes
-- **Lucide Icons**: Clean, consistent iconography throughout
+---
 
-## Color Palette
+## 🎯 Overview
 
-- **Space Cadet**: `#22223b` - Primary brand color
-- **Ultra Violet**: `#4a4e69` - Secondary actions and text
-- **Rose Quartz**: `#9a8c98` - Accent and interactive elements
-- **Pale Dogwood**: `#c9ada7` - Borders and subtle backgrounds
-- **Isabelline**: `#f2e9e4` - Light backgrounds and text
+YardStick is a multi-tenant SaaS notes application featuring:
+- **Multi-tenant architecture** with FREE and PRO plans
+- **Role-based access control** (Admin/Member)
+- **JWT authentication** with secure sessions
+- **CRUD operations** for notes management
+- **Plan upgrade functionality** for admins
+- **Responsive design** with dark/light mode
 
-## Tech Stack
+---
 
-- **Framework**: Next.js 14 with App Router
-- **Styling**: Tailwind CSS v4 with custom design tokens
-- **UI Components**: shadcn/ui + Radix UI primitives
-- **Icons**: Lucide React
-- **Theme**: next-themes for dark/light mode
-- **Typography**: Geist Sans & Geist Mono fonts
-- **Animations**: Tailwind CSS animations + custom keyframes
+## 🛠️ Tech Stack
 
-## Getting Started
+### Frontend
+- **Framework:** Next.js 14 with TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:** Radix UI + Shadcn/ui
+- **HTTP Client:** Axios
+- **Deployment:** Vercel
 
-1. **Install dependencies**:
-   \`\`\`bash
-   npm install
-   \`\`\`
+### Backend
+- **Runtime:** Node.js with Express.js
+- **Database:** MongoDB with Mongoose
+- **Authentication:** JWT + bcrypt
+- **Middleware:** CORS, Cookie Parser, Express Session
+- **Deployment:** Vercel
 
-2. **Run the development server**:
-   \`\`\`bash
-   npm run dev
-   \`\`\`
+---
 
-3. **Open your browser** and navigate to `http://localhost:3000`
+## 🗄️ Database Models
 
-## Authentication
+### User Model (`models/User.js`)
+```javascript
+{
+  _id: ObjectId,
+  name: String,           // User's full name
+  email: String,          // Unique email address (indexed)
+  password: String,       // Hashed password (bcrypt)
+  role: String,           // "ADMIN" | "MEMBER"
+  tenantId: ObjectId,     // Reference to tenant
+  createdAt: Date,
+  updatedAt: Date
+}
+```
 
-The app includes three authentication methods:
+### Tenant Model (`models/tenent.js`)
+```javascript
+{
+  _id: ObjectId,
+  name: String,           // Tenant/Company name
+  slug: String,           // Unique slug for URL (indexed)
+  plan: String,           // "FREE" | "PRO"
+  upgradedAt: Date,       // When plan was upgraded
+  createdAt: Date,
+  updatedAt: Date
+}
+```
 
-### Email Login
-- Demo credentials: `demo@example.com` / `password`
-- Full form validation and error handling
+### Note Model (`models/note.js`)
+```javascript
+{
+  _id: ObjectId,
+  noteId: String,         // Display ID for users
+  title: String,          // Note title
+  content: String,        // Note content/body
+  userId: ObjectId,       // Reference to creator
+  tenantId: ObjectId,     // Tenant isolation
+  createdAt: Date,
+  updatedAt: Date
+}
+```
 
-### Google OAuth
-- Simulated Google authentication flow
-- One-click sign-in experience
+---
 
-### Phone OTP
-- SMS verification simulation
-- Demo OTP: `123456`
+## 🛣️ API Routes
 
-## Project Structure
+### Authentication Routes
+- `POST /api/login` - User authentication
+- `POST /api/register` - User registration (creates tenant)
+- `POST /api/logout` - User logout (clears session)
 
-\`\`\`
-saas-notes-app/
-├── app/                    # Next.js App Router
-│   ├── globals.css        # Global styles and custom properties
-│   ├── layout.tsx         # Root layout with theme provider
-│   ├── page.tsx          # Authentication page
-│   └── dashboard/        # Dashboard pages
-├── components/
-│   ├── auth/             # Authentication components
-│   ├── dashboard/        # Dashboard and notes components
-│   ├── ui/              # Reusable UI components (shadcn/ui)
-│   ├── theme-provider.tsx
-│   └── theme-toggle.tsx
-└── lib/
-    └── utils.ts          # Utility functions
-\`\`\`
+### User Management Routes
+- `POST /api/adduser` - Add new team member (Admin only)
 
-## Mobile Features
+### Notes Management Routes
+- `GET /api/userNotes` - Get user's notes and profile
+- `POST /api/addNote` - Create new note
+- `PUT /api/editNote/:id` - Update existing note
+- `DELETE /api/deleteNote/:id` - Delete note
 
-- **Responsive Design**: Mobile-first approach with breakpoint-specific layouts
-- **Touch Optimization**: 44px minimum touch targets for better accessibility
-- **Mobile FAB**: Floating action button for quick note creation
-- **Collapsible Forms**: Space-efficient mobile interfaces
-- **Safe Area Support**: Proper handling of device notches and home indicators
+### Subscription Management Routes
+- `POST /api/tenants/:slug/upgrade` - Upgrade tenant plan to PRO (Admin only)
 
-## Customization
+---
 
-The color palette is fully customizable through CSS custom properties in `globals.css`. The design system uses semantic tokens that automatically adapt to both light and dark themes.
+## 🔐 Authentication & Authorization
 
-## License
+### JWT Authentication
+- **Token Storage:** HTTP-only cookies
+- **Token Expiry:** 24 hours
+- **Middleware:** `protect` middleware validates JWT and adds user to request
 
-MIT License - feel free to use this project as a starting point for your own applications.
+### Role-Based Access Control
+
+| Role | Permissions |
+|------|-------------|
+| **ADMIN** | ✅ All note operations<br>✅ Add team members<br>✅ Upgrade tenant plan<br>✅ View tenant dashboard |
+| **MEMBER** | ✅ Personal note operations<br>❌ Add users<br>❌ Upgrade plan<br>❌ Admin dashboard |
+
+### Multi-Tenant Security
+- **Data Isolation:** All queries filtered by `tenantId`
+- **Tenant Scope:** Users only access their tenant's data
+- **Admin Verification:** Admin actions verified against tenant ownership
+
+---
